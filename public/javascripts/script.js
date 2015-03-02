@@ -14,6 +14,15 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     text: ''
   }
 
+  var not_found = {
+    class: 'btn-danger',
+    text: 'Not Found'
+  };
+  var found = {
+    class: 'btn-success',
+    text: 'Done'
+  };
+
   var highlight = function( text, focus ){
     var r = RegExp( '('+ focus + ')', 'gi' );
     return text.replace( r, '<strong>$1</strong>' );
@@ -41,8 +50,8 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
           res.type = res.properties.type;
           return res;
         });
-        $scope.button.class = 'btn-danger';
-        $scope.button.text  = 'Not Found';
+        $scope.button.class = not_found.class;
+        $scope.button.text  = not_found.text;
       }
       else {
         $scope[resultkey] = [];
@@ -60,14 +69,8 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       $scope.resultsSelected--;
       result.icon = 'unchecked';
     }
-    if ($scope.resultsSelected > 0) {
-      $scope.button.class = 'btn-success';
-      $scope.button.text  = 'Done';  
-    } else {
-      $scope.button.class = 'btn-danger';
-      $scope.button.text  = 'Not Found';
-    }
-    
+    $scope.button.class = $scope.resultsSelected > 0 ? found.class : not_found.class;
+    $scope.button.text  = $scope.resultsSelected > 0 ? found.text : not_found.text;    
   }
 
   $rootScope.$on( 'hideall', function( ev ){
@@ -95,6 +98,33 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.fullTextSearch = function(){
     var url = $scope.searchType.toLowerCase() === 'fine' ? '/search' : '/search/coarse';
     getResults(url, 'searchresults');
+  }
+
+  $scope.giveFeedback = function(button_class) {
+    var success = button_class === found.class;
+    var searchresults = $scope.searchresults.map(function(res) {
+      return {
+        type: res.type,
+        geometry: res.geometry,
+        properties: res.properties,
+        icon: res.icon
+      }
+    })
+    
+    var log = {
+      query: $scope.search,
+      found: success,
+      results: searchresults
+    };
+
+    if (success) {
+      log.selected = searchresults.filter(function(res){
+        return res.icon === 'check';
+      });
+    }
+
+    console.log(log)
+
   }
 
 })
