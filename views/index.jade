@@ -1,17 +1,20 @@
 extends layout
 
 block content
-  section#searchbar(data-ng-controller="SearchController")
-    form(role="search")
-      div.input
-        input.form-control(type="text", data-ng-model="search", ng-focus="onFocus($event)", ng-blur="onBlur($event)", ng-keydown="keyPressed($event)", placeholder="Search")
+  div.row(data-ng-controller="SearchController")
+    section#searchbar.col-md-5
+      form(role="search")
+        div.input
+          input.form-control(type="text", data-ng-model="search", ng-focus="onFocus($event)", ng-blur="onBlur($event)", ng-keydown="keyPressed($event)", placeholder="Search")
 
-    ul#searchresults.results
-      li(data-ng-repeat="result in searchresults")
-        a(data-ng-click="selectResult(result)")
-          i(title="{{result.type}}", data-toggle="tooltip", class="glyphicon glyphicon-{{result.icon}}")
-          span(data-ng-bind-html="result.htmltext")
-          div.aside
-            i.glypicon.glypicon-screenshot
+      ul#searchresults.results
+        li(data-ng-repeat="result in searchresults")
+          a(data-ng-click="selectResult(result)")
+            i(title="{{result.type}}", data-toggle="tooltip", class="glyphicon glyphicon-{{result.icon}}")
+            span(data-ng-bind-html="result.htmltext")
+          a(data-ng-click="showMap(result)")
+            i.glyphicon.glyphicon-map-marker(title='click to see map')
 
-    button(class='headroom btn btn-default btn-block {{button.class}}', ng-click='giveFeedback(button.class, attempt)')= "{{button.text}}"
+      button(class='headroom btn btn-default btn-block {{button.class}}', ng-click='giveFeedback(button.class, attempt)')= "{{button.text}}"
+    section#mapView(class='col-md-7 headroom {{map_class}}')
+      div#map

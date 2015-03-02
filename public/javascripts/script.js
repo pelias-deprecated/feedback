@@ -4,6 +4,20 @@ app.run(function($rootScope) {});
 
 app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   
+  $scope.map = L.map('map', {
+      zoom: 8,
+      center: [0,0],
+      maxBounds: L.latLngBounds(L.latLng(-80, -180), L.latLng(82, 180))
+  });
+
+  L.tileLayer('//{s}.tiles.mapbox.com/v3/randyme.i0568680/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      minZoom: 3,
+      noWrap: true
+  }).addTo($scope.map);
+  $scope.map_class = 'hidden';
+
   $scope.search = '';
   $scope.searchresults = [];
   $scope.searchType = 'fine';
@@ -135,6 +149,36 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     getResults(url, 'searchresults');
   }
 
+  var markers = [];
+  var remove_markers = function(){
+    for (i=0; i<markers.length; i++) {
+      $scope.map.removeLayer(markers[i]);
+    }
+    markers = [];
+  };
+
+  var add_marker = function(geo, text) {
+    var marker = new L.marker(geo).bindPopup(text);
+    $scope.map.addLayer(marker);
+    markers.push(marker);
+    marker.openPopup();
+  };
+
+  $scope.showMap = function(result) {
+    $scope.map_class = '';
+    remove_markers();
+
+    if (result.geometry) {
+      var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
+      $scope.map.setView(geo, 8);
+      add_marker(geo, result.properties.text);
+    } else {
+      var geo = [result.lat,result.lon];
+      $scope.map.setView(geo, 8);
+      add_marker(geo, result.display_name);
+    }
+  };
+
   $scope.giveFeedback = function(button_class) {
     var success = button_class === found.class;
     
@@ -186,6 +230,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       }
       $scope.log={};
       $scope.attempt =0;
+      $scope.map_class='hidden';
     }
   }
 
