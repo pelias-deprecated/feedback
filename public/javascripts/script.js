@@ -4,8 +4,10 @@ app.run(function($rootScope) {});
 
 app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   
+  var default_zoom = 3;
+
   $scope.map = L.map('map', {
-      zoom: 8,
+      zoom: default_zoom,
       center: [0,0],
       maxBounds: L.latLngBounds(L.latLng(-80, -180), L.latLng(82, 180))
   });
@@ -179,11 +181,11 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
 
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
-      $scope.map.setView(geo, 8);
+      $scope.map.setView(geo, default_zoom);
       add_marker(geo, result.properties.text);
     } else {
       var geo = [result.lat,result.lon];
-      $scope.map.setView(geo, 8);
+      $scope.map.setView(geo, default_zoom);
       add_marker(geo, result.display_name);
     }
   };
