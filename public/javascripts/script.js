@@ -34,9 +34,14 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     class: 'btn-danger',
     text: 'Not Found'
   };
+
+  var not_found_in_pelias = not_found.text + ' in pelias? Click here to search other sources';
+  var not_found_in_nominatum = not_found.text + ' in other sources either? Click here to report';
+  var calling_nominatum = 'Please wait, Searching other sources..';
+
   var found = {
     class: 'btn-success',
-    text: 'Done'
+    text: 'Click here to send us your feedback. Thank you!'
   };
 
   var highlight = function( text, focus ){
@@ -69,7 +74,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
           return res;
         });
         $scope.button.class = not_found.class;
-        $scope.button.text  = not_found.text;
+        $scope.button.text  = not_found_in_pelias;
       }
       else {
         $scope[resultkey] = [];
@@ -100,14 +105,16 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
           res.icon = 'unchecked';
           return res;
         });
-        $scope.button.class = not_found.class;
-        $scope.button.text  = not_found.text;
       }
       else {
         $scope[resultkey] = [];
       }
+      $scope.button.class = not_found.class;
+      $scope.button.text  = not_found_in_nominatum;
     }).error(function (data, status, headers, config) {
       $scope[resultkey] = [];
+      $scope.button.class = not_found.class;
+      $scope.button.text  = not_found_in_nominatum;
     });
   }
   $scope.selectResult = function( result, changeQuery ){
@@ -199,6 +206,8 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       
       if (!success) {
         //call nominatum
+        $scope.button.class = found.class;
+        $scope.button.text  = calling_nominatum;  
         getResultsFromNominatum();
       }
     } else {
