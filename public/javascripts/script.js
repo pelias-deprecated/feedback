@@ -22,6 +22,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.searchresults = [];
   $scope.searchType = 'fine';
   $scope.api_url = '//pelias.mapzen.com';
+  $scope.feedback_url = '//localhost:3000';
   $scope.resultsSelected = 0;
   $scope.button = {
     class: 'hidden',
@@ -38,6 +39,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   var not_found_in_pelias = not_found.text + ' in pelias? Click here to search other sources';
   var not_found_in_nominatum = not_found.text + ' in other sources either? Click here to report';
   var calling_nominatum = 'Please wait, Searching other sources..';
+  var uploading_feedback= 'Sending your feedback! Thank you again';
 
   var found = {
     class: 'btn-success',
@@ -227,19 +229,33 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
 
     if (success || $scope.attempt===2) {
       // upload logs
-      console.log($scope.log)
+      $http({
+        url: $scope.feedback_url + '/upload',
+        method: 'POST',
+        params: {'log': $scope.log},
+        headers: { 'Accept': 'application/json' }
+      }).success(function (data, status, headers, config) {
+        $scope.button.class = found.class;
+        $scope.button.text  = uploading_feedback;
+        resetScope(); 
+      }).error(function (data, status, headers, config) {
+        console.log(data);
+        resetScope();
+      });
 
-      // reset
-      $scope.search = '';
-      $scope.searchresults = [];
-      $scope.resultsSelected = 0;
-      $scope.button = {
-        class: 'hidden',
-        text: ''
+      var resetScope = function() {
+        // reset
+        $scope.search = '';
+        $scope.searchresults = [];
+        $scope.resultsSelected = 0;
+        $scope.button = {
+          class: 'hidden',
+          text: ''
+        }
+        $scope.log={};
+        $scope.attempt =0;
+        $scope.map_class='hidden';
       }
-      $scope.log={};
-      $scope.attempt =0;
-      $scope.map_class='hidden';
     }
   }
 
