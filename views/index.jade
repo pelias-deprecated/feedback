@@ -2,7 +2,7 @@ extends layout
 
 block content
   div.row(data-ng-controller="SearchController")
-    section#searchbar.col-md-5
+    section#searchbar.col-md-5.col-sm-5.col-xs-12
       form(role="search")
         div.input
           input.form-control(type="text", data-ng-model="search", ng-focus="onFocus($event)", ng-blur="onBlur($event)", ng-keydown="keyPressed($event)", placeholder="Search")
@@ -13,8 +13,8 @@ block content
             i(title="{{result.type}}", data-toggle="tooltip", class="glyphicon glyphicon-{{result.icon}}")
             span(data-ng-bind-html="result.htmltext")
           a(data-ng-click="showMap(result)")
-            i.glyphicon.glyphicon-map-marker(title='click to see map')
+            i.glyphicon.glyphicon-map-marker.hidden-xs(title='click to see map')
 
       button(class='headroom btn btn-default btn-block {{button.class}}', ng-click='giveFeedback(button.class, attempt)')= "{{button.text}}"
-    section#mapView(class='col-md-7 headroom {{map_class}}')
+    section#mapView(class='col-md-7 col-sm-7 col-xs-0 hidden-xs headroom {{map_class}}')
       div#map
