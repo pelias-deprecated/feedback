@@ -103,6 +103,10 @@ i.glyphicon.glyphicon-check {
   color:green;
 }
 
+.headroom {
+  margin-top:10px;
+}
+
 .aside em {
   -webkit-border-top-right-radius: 0px;
   -webkit-border-bottom-right-radius: 0px;
