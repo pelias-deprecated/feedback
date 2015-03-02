@@ -68,7 +68,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
         $scope[resultkey].length = 0;
         $scope.resultsSelected = 0;
         $scope[resultkey] = data.features.map( function( res ){
-          res.htmltext = $sce.trustAsHtml(highlight( res.properties.text, $scope.search ));
+          res.htmltext = $sce.trustAsHtml(highlight( res.properties.text, $scope.search ) + (res.properties.alpha3 ? ', '+ res.properties.alpha3 : ''));
           res.icon = 'unchecked';
           res.type = res.properties.type;
           return res;
