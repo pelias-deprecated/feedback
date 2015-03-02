@@ -13,6 +13,8 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     class: 'hidden',
     text: ''
   }
+  $scope.log={};
+  $scope.attempt =0;
 
   var not_found = {
     class: 'btn-danger',
@@ -42,6 +44,8 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       headers: { 'Accept': 'application/json' }
     }).success(function (data, status, headers, config) {
       if( data ){
+        $scope.log = {};
+        $scope.attempt = 0;
         $scope[resultkey].length = 0;
         $scope.resultsSelected = 0;
         $scope[resultkey] = data.features.map( function( res ){
@@ -61,6 +65,37 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     });
   };
 
+  var getResultsFromNominatum = function(resultkey) {
+    var params = {
+      q: $scope.search,
+      format: 'json'
+    };
+    resultkey = resultkey || 'searchresults';
+
+    $http({
+      url: 'http://nominatim.openstreetmap.org/search',
+      method: 'GET',
+      params: params,
+      headers: { 'Accept': 'application/json' }
+    }).success(function (data, status, headers, config) {
+      if( data ){
+        $scope[resultkey].length = 0;
+        $scope.resultsSelected = 0;
+        $scope[resultkey] = data.map( function( res ){
+          res.htmltext = $sce.trustAsHtml(highlight( res.display_name, $scope.search ));
+          res.icon = 'unchecked';
+          return res;
+        });
+        $scope.button.class = not_found.class;
+        $scope.button.text  = not_found.text;
+      }
+      else {
+        $scope[resultkey] = [];
+      }
+    }).error(function (data, status, headers, config) {
+      $scope[resultkey] = [];
+    });
+  }
   $scope.selectResult = function( result, changeQuery ){
     if (result.icon === 'unchecked') {
       $scope.resultsSelected++;
@@ -102,29 +137,56 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
 
   $scope.giveFeedback = function(button_class) {
     var success = button_class === found.class;
-    var searchresults = $scope.searchresults.map(function(res) {
-      return {
-        type: res.type,
-        geometry: res.geometry,
-        properties: res.properties,
-        icon: res.icon
-      }
-    })
     
-    var log = {
-      query: $scope.search,
-      found: success,
-      results: searchresults
-    };
+    if ($scope.attempt === 0) {
+      var searchresults = $scope.searchresults.map(function(res) {
+        return {
+          type: res.type,
+          geometry: res.geometry,
+          properties: res.properties,
+          icon: res.icon
+        }
+      });
+      $scope.log = {
+        query: $scope.search,
+        found: success,
+        results: searchresults
+      };
+      
+      if (!success) {
+        //call nominatum
+        getResultsFromNominatum();
+      }
+    } else {
+      // logging nominatum
+      var searchresults = $scope.searchresults;
+      $scope.log.found = success;
+      $scope.log.nominatum_results = searchresults;
+    }
+
+    $scope.attempt++;
 
     if (success) {
-      log.selected = searchresults.filter(function(res){
+      $scope.log.selected = searchresults.filter(function(res){
         return res.icon === 'check';
       });
     }
 
-    console.log(log)
+    if (success || $scope.attempt===2) {
+      // upload logs
+      console.log($scope.log)
 
+      // reset
+      $scope.search = '';
+      $scope.searchresults = [];
+      $scope.resultsSelected = 0;
+      $scope.button = {
+        class: 'hidden',
+        text: ''
+      }
+      $scope.log={};
+      $scope.attempt =0;
+    }
   }
 
 })
