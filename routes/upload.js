@@ -9,9 +9,11 @@ router.post('/', function(req, res, next) {
 
   // Set our collection
   var collection = db.get('pelias');
-  
+  var doc = JSON.parse(req.query.log);
+
+  doc.timestamp = (new Date()).toISOString();
   // Submit to the DB
-  collection.insert(JSON.parse(req.query.log), function (err, doc) {
+  collection.insert(doc, function (err, doc) {
       if (err) {
           // If it failed, return error
           console.log(err);        

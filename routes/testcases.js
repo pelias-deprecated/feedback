@@ -5,7 +5,7 @@ var router = express.Router();
 router.get('/', function(req, res) {
   var db = req.db;
   var collection = db.get('pelias');
-  collection.find({},{limit: 30},function(e,docs){
+  collection.find({},{limit: 30, sort: {timestamp: -1}},function(e,docs){
     docs = docs.map(function(doc) {
       if (!doc.found) {
         doc.classname = 'danger';
