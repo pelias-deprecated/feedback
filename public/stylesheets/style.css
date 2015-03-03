@@ -96,9 +96,14 @@ i.glyphicon {
   margin-right: 5px;
   color:#999;
 }
-
+ul.results li a:hover i.glyphicon-unchecked {
+  color:#4cae4c;
+}
+ul.results li a:hover i.glyphicon-map-marker {
+  color:#277eeb;
+}
 i.glyphicon.glyphicon-check {
-  color:green;
+  color:#5cb85c;
 }
 
 .headroom {
