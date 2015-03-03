@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  div.container.headroom
+    div.table-responsive
+      table.table.table-striped
+        thead
+          tr
+            th #
+            th Query
+            th Found in Pelias
+            th Found in Other Sources
+            th Selected
+        tbody  
+          each testcase, i in testcases
+            tr(class="#{testcase.classname}")
+              th= i + 1
+              td= testcase.query
+              td= testcase.found_in_pelias
+              td= testcase.found_in_nominatum
+              td
+                if testcase.selected
+                  each selected, i in testcase.selected
+                    div= selected.doc_text
+                else
+                  div -

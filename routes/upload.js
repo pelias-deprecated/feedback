@@ -1,12 +1,26 @@
 var express = require('express');
 var router = express.Router();
-var fs = require("fs");
 
 /* POST your feedback */
 router.post('/', function(req, res, next) {
-  fs.appendFile( "log.json", '\n'+JSON.stringify( req.query.log ), "utf8", function(){
-    res.send({ success: true });
-  });  
+  
+  // Set our internal DB variable
+  var db = req.db;
+
+  // Set our collection
+  var collection = db.get('pelias');
+  
+  // Submit to the DB
+  collection.insert(JSON.parse(req.query.log), function (err, doc) {
+      if (err) {
+          // If it failed, return error
+          console.log(err);        
+          res.send("There was a problem adding the information to the database.");
+      }
+      else {
+          res.send({ success: true });
+      }
+  });
 });
 
 module.exports = router;
