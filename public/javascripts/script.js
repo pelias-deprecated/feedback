@@ -24,7 +24,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.searchresults = [];
   $scope.searchType = 'fine';
   $scope.api_url = '//pelias.mapzen.com';
-  $scope.feedback_url = '//localhost:3000';
+  $scope.feedback_url = '/';
   $scope.resultsSelected = 0;
   $scope.button = {
     class: 'hidden',
@@ -233,7 +233,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     if (success || $scope.attempt===2) {
       // upload logs
       $http({
-        url: $scope.feedback_url + '/upload',
+        url: $scope.feedback_url + 'upload',
         method: 'POST',
         params: {'log': $scope.log},
         headers: { 'Accept': 'application/json' }
