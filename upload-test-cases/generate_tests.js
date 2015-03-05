@@ -31,7 +31,7 @@ function addTests( testsJson, cb ){
         delete testCaseProps.id;
         expectedOutput = testCaseProps;
       }
-      else if( 'selected' in doc ){
+      else if( 'selected' in doc && doc.selected.length > 0 ){
         expectedOutput = doc.selected[ 0 ].display_name;
       }
 
@@ -45,8 +45,10 @@ function addTests( testsJson, cb ){
       });
     });
 
-    cb( testsJson );
-    db.close();
+    peliasCollection.remove( {}, function (){
+      db.close();
+      cb( testsJson );
+    });
   });
 }
 
