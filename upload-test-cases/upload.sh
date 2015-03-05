@@ -3,25 +3,26 @@
 # branch, and opens a pull request in that repository.
 
 api_key="$1"
-if [ "api_key" = "" ]; then
+if [ "$api_key" = "" ]; then
 	>&2 echo "No GitHub API key argument provided. Exiting."
 else
 	# Generate and add new test-cases.
-	git clone git@github.com:pelias/acceptance-tests
-	node generate_tests.js acceptance-tests/test_cases/search.json
-	cd acceptance-tests
+	repo_dest=/tmp/acceptance-tests
+	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
+	node generate_tests.js $repo_dest/test_cases/search.json
+	cd $repo_dest
 
 	# Checkout a branch, push the new test-cases.
 	date="$(date -I)"
 	branchName="feedback_$date"
-	git checkout -b $branchName
+	git checkout -q -b $branchName
 	git add test_cases/search.json
-	git commit -m "Feedback app test-cases for $date."
-	git push --set-upstream origin $branchName
+	git commit -q -m "Feedback app test-cases for $date."
+	git push -q --set-upstream origin $branchName
 
 	# Open a pull request for the new branch.
-	curl -X POST -H "Content-Type: application/json" \
-		-u sevko:$api_key -d '{
+	curl --silent --show-error -X POST -H "Content-Type: application/json" \
+		--user sevko:$api_key -d '{
 			"title": "feedback app test cases for '$date'",
 			"body": "",
 			"head": "feedback_'$date'",
@@ -29,5 +30,5 @@ else
 		}' https://api.github.com/repos/pelias/acceptance-tests/pulls
 
 	cd ..
-	rm -rf acceptance-tests
+	rm -rf $repo_dest
 fi
