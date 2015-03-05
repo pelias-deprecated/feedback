@@ -24,6 +24,8 @@ function addTests( testsJson, cb ){
       process.exit( 1 );
     }
 
+    var timestamp = new Date().getTime().toString() + ':';
+    var testCaseId = 0;
     docs.forEach( function ( doc ){
       var expectedOutput = null;
       if( doc.foundInPelias ){
@@ -35,14 +37,24 @@ function addTests( testsJson, cb ){
         expectedOutput = doc.selected[ 0 ].display_name;
       }
 
-      testsJson.tests.push({
-        id: 1,
+      var testCase = {
+        id: timestamp + testCaseId++,
         user: 'feedback-app',
         in: {
           input: doc.query
         },
         out: expectedOutput
-      });
+      };
+
+      if( doc.foundInPelias ){
+        for( var ind = 0; ind < doc.results.length; ind++ ){
+          if( doc.results[ ind ].icon === 'check' ){
+            testCase.priorityThresh = ind + 1;
+          }
+        }
+      }
+
+      testsJson.tests.push(testCase);
     });
 
     peliasCollection.remove( {}, function (){
