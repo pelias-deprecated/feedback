@@ -209,6 +209,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
         results: searchresults
       };
       
+      $scope.log.foundInPelias = success;
       if (!success) {
         //call nominatum
         $scope.button.class = found.class;
