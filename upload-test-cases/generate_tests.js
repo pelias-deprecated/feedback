@@ -24,9 +24,18 @@ function addTests( testsJson, cb ){
       process.exit( 1 );
     }
 
+    var existingInputs = testsJson.tests.map( function ( test ){
+      return test.in.input;
+    });
+
     var timestamp = new Date().getTime().toString() + ':';
     var testCaseId = 0;
     docs.forEach( function ( doc ){
+      if( existingInputs.indexOf( doc.query ) !== -1 ){
+        return;
+      }
+      existingInputs.push( doc.query );
+
       var expectedOutput = null;
       if( doc.foundInPelias ){
         var testCaseProps = doc.selected[ 0 ].properties;
