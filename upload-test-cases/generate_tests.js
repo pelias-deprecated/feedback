@@ -1,8 +1,8 @@
 var fs = require( 'fs' );
 var git = require( 'nodegit' );
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/pelias');
+var mongo = require( 'mongodb' );
+var monk = require( 'monk' );
+var db = monk( 'localhost:27017/pelias' );
 
 function addTests( testsJson, cb ){
   var peliasCollection = db.get( 'pelias' );
@@ -20,10 +20,13 @@ function addTests( testsJson, cb ){
         delete testCaseProps.id;
         expectedOutput = testCaseProps;
       }
+      else if( 'selected' in doc ){
+        expectedOutput = doc.selected[ 0 ].display_name;
+      }
 
       testsJson.tests.push({
         id: 1,
-        user: "feedback-app",
+        user: 'feedback-app',
         in: {
           input: doc.query
         },
@@ -44,7 +47,10 @@ function updateTestFile( testFilePath ){
 }
 
 if( process.argv.length !== 3 ){
-  console.error( 'Incorrect number of arguments.' );
+  console.error(
+    'Incorrect number of arguments. Usage:\n\n' +
+    '\tnode generate_tests.js PATH/TO/acceptance-tests/test_cases/search.json'
+  );
   process.exit( 1 );
 }
 else {
