@@ -10,25 +10,27 @@ else
 	repo_dest=/tmp/acceptance-tests
 	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
 	node generate_tests.js $repo_dest/test_cases/search.json
-	cd $repo_dest
+	if [ $? -eq 0 ]; then
+		cd $repo_dest
 
-	# Checkout a branch, push the new test-cases.
-	date="$(date -I)"
-	branchName="feedback_$date"
-	git checkout -q -b $branchName
-	git add test_cases/search.json
-	git commit -q -m "Feedback app test-cases for $date."
-	git push -q --set-upstream origin $branchName
+		# Checkout a branch, push the new test-cases.
+		date="$(date -I)"
+		branchName="feedback_$date"
+		git checkout -q -b $branchName
+		git add test_cases/search.json
+		git commit -q -m "Feedback app test-cases for $date."
+		git push -q --set-upstream origin $branchName
 
-	# Open a pull request for the new branch.
-	curl --silent --show-error -X POST -H "Content-Type: application/json" \
-		--user sevko:$api_key -d '{
-			"title": "feedback app test cases for '$date'",
-			"body": "",
-			"head": "feedback_'$date'",
-			"base": "master"
-		}' https://api.github.com/repos/pelias/acceptance-tests/pulls
+		# Open a pull request for the new branch.
+		curl --silent --show-error -X POST -H "Content-Type: application/json" \
+			--user sevko:$api_key -d '{
+				"title": "feedback app test cases for '$date'",
+				"body": "",
+				"head": "feedback_'$date'",
+				"base": "master"
+			}' https://api.github.com/repos/pelias/acceptance-tests/pulls
 
-	cd ..
-	rm -rf $repo_dest
+		cd ..
+	fi
 fi
+rm -rf $repo_dest

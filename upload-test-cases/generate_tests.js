@@ -24,6 +24,11 @@ function addTests( testsJson, cb ){
       process.exit( 1 );
     }
 
+    if( docs.length === 0 ){
+      console.error( 'No test cases found in the MongoDB Pelias collection.' );
+      process.exit( 2 );
+    }
+
     var existingInputs = testsJson.tests.map( function ( test ){
       return test.in.input;
     });
