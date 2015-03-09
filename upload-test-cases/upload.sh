@@ -17,7 +17,7 @@ else
 		cd $repo_dest
 
 		# Checkout a branch, push the new test-cases.
-		date="$(date -I)"
+		date="$(date +%Y-%M-%d-%H-%M-%S)"
 		branchName="feedback_$date"
 		git checkout -q -b $branchName
 		git add test_cases/search.json
