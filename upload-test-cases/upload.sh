@@ -6,7 +6,7 @@ api_key=$1
 user=$2
 
 if [ -z $2 ]; then
-  echo "Usage: $0 $api_key $user"
+  echo "Usage: $0 api_key user"
   exit 1
 else
   # Generate and add new test-cases.
