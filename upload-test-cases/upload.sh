@@ -7,10 +7,10 @@ user=$2
 delay_before_pull=${3:-3}
 
 if [ -z $2 ]; then
-  echo "Usage: $0 [api_key] [user] {delay_before_pull}"
-  exit 1
+	echo "Usage: $0 [api_key] [user] {delay_before_pull}"
+	exit 1
 else
-  # Generate and add new test-cases.
+	# Generate and add new test-cases.
 	repo_dest=/tmp/acceptance-tests
 	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
 	node generate_tests.js $repo_dest/test_cases/search.json
@@ -25,8 +25,8 @@ else
 		git commit -q -m "Feedback app test-cases for $date."
 		git push -q --set-upstream origin $branchName
 
-    # sleep before submitting our pull
-    sleep $delay_before_pull
+	# sleep before submitting our pull
+	sleep $delay_before_pull
 
 		# Open a pull request for the new branch.
 		curl --silent --show-error -X POST -H "Content-Type: application/json" \
