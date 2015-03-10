@@ -12,6 +12,10 @@ if [ -z $2 ]; then
 else
 	# Generate and add new test-cases.
 	repo_dest=/tmp/acceptance-tests
+  if [ -d $repo_dest]; then
+    rm -rf $repo_dest
+  fi
+
 	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
 	node generate_tests.js $repo_dest/test_cases/search.json
 	if [ $? -eq 0 ]; then
