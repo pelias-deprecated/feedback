@@ -12,7 +12,7 @@ if [ -z $2 ]; then
 else
 	# Generate and add new test-cases.
 	repo_dest=/tmp/acceptance-tests
-  if [ -d $repo_dest]; then
+  if [ -d $repo_dest ]; then
     rm -rf $repo_dest
   fi
 
