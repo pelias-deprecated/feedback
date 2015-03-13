@@ -131,6 +131,11 @@ section#mapView div#map{
   margin-top:10px;
 }
 
+span.key {
+  font-family: courier;
+  color: gray;
+}
+
 /* small mobile devices */
 @media(max-width:767px){
 }

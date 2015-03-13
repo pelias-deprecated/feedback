@@ -170,7 +170,18 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   };
 
   var add_marker = function(geo, text) {
-    var marker = new L.marker(geo).bindPopup(text);
+    var marker;
+
+    if (typeof text == 'string') {
+      marker = new L.marker(geo).bindPopup(text); 
+    } else if (typeof text == 'object') {
+      var full_text = '';
+      for (key in text){
+        full_text += ('<span class=\'key\'>' + key + '</span>: ' + text[key] + '<br/>');
+      }
+      marker = new L.marker(geo).bindPopup(full_text); 
+    }
+    
     $scope.map.addLayer(marker);
     markers.push(marker);
     marker.openPopup();
@@ -183,7 +194,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
       $scope.map.setView(geo, default_zoom);
-      add_marker(geo, result.properties.text);
+      add_marker(geo, result.properties);
     } else {
       var geo = [result.lat,result.lon];
       $scope.map.setView(geo, default_zoom);
