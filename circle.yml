@@ -9,11 +9,12 @@ test:
     - echo "we need no tests"
 
 deployment:
-  staging:
-    branch: master
-    commands:
-      - ./deploy/env.rb staging
+  #staging:
+  #  branch: master
+  #  commands:
+  #    - ./deploy/env.rb staging
   production:
-    branch: production 
+    # branch: production # maybe later on
+    branch: master
     commands:
       - ./deploy/env.rb production
