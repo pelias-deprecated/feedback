@@ -9,6 +9,7 @@ block content
             th #
             th Query
             th Found in Pelias
+            th Order
             th Found in Other Sources
             th Selected
         tbody  
@@ -17,6 +18,7 @@ block content
               th= i + 1
               td= testcase.query
               td= testcase.found_in_pelias
+              td= testcase.selected_index + 1 || 'N/A'
               td= testcase.found_in_nominatum
               td
                 if testcase.selected
