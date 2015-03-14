@@ -4,7 +4,7 @@ app.run(function($rootScope) {});
 
 app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   
-  var default_zoom = 3;
+  var default_zoom = 10;
 
   $scope.map = L.map('map', {
       zoom: default_zoom,
