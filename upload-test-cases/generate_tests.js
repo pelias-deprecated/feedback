@@ -40,29 +40,37 @@ function addTests( testsJson, cb ){
       }
       existingInputs.push( doc.query );
 
-      var expectedOutput = null;
-      if( doc.foundInPelias ){
-        var testCaseProps = doc.selected[ 0 ].properties;
-        delete testCaseProps.id;
-        expectedOutput = testCaseProps;
-      }
-      else if( 'selected' in doc && doc.selected.length > 0 ){
-        expectedOutput = doc.selected[ 0 ].display_name;
-      }
-
       var testCase = {
         id: timestamp + testCaseId++,
         user: 'feedback-app',
         in: {
           input: doc.query
         },
-        out: expectedOutput
+        expected: {
+          properties: null
+        }
       };
 
+      var expectedOutput = null;
       if( doc.foundInPelias ){
-        for( var ind = 0; ind < doc.results.length; ind++ ){
+        testCase.status = 'pass';
+        var testCaseProps = doc.selected[ 0 ].properties;
+        delete testCaseProps.id;
+        expectedOutput = testCaseProps;
+        testCase.expected.properties = doc.selected.map( function ( selectedItem ){
+          delete selectedItem.properties.id;
+          return selectedItem.properties;
+        });
+      }
+      else if( 'selected' in doc && doc.selected.length > 0 ){
+        expectedOutput = doc.selected[ 0 ].display_name;
+      }
+
+      if( doc.foundInPelias ){
+        for( var ind = doc.results.length - 1; ind >= 0; ind-- ){
           if( doc.results[ ind ].icon === 'check' ){
-            testCase.priorityThresh = ind + 1;
+            testCase.expected.priorityThresh = ind + 1;
+            break;
           }
         }
       }
