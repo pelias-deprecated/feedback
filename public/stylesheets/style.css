@@ -131,6 +131,10 @@ section#mapView div#map{
   margin-top:10px;
 }
 
+.width-zero{
+  width:0px;
+  height:0px;
+}
 span.key {
   font-family: courier;
   color: gray;
