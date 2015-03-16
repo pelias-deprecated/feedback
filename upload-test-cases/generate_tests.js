@@ -78,9 +78,11 @@ function addTests( testsJson, cb ){
       testsJson.tests.push(testCase);
     });
 
-    peliasCollection.remove( {}, function (){
-      db.close();
-      cb( testsJson );
+    db.get( 'peliasBackup' ).insert( docs, function (){
+      peliasCollection.remove( {}, function (){
+        db.close();
+        cb( testsJson );
+      });
     });
   });
 }
