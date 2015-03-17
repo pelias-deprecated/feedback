@@ -17,7 +17,7 @@ else
   fi
 
 	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
-	node generate_tests.js
+	node generate_tests.js $repo_dest
 	if [ $? -eq 0 ]; then
 		cd $repo_dest
 
@@ -25,7 +25,7 @@ else
 		date="$(date +%Y-%M-%d-%H-%M-%S)"
 		branchName="feedback_$date"
 		git checkout -q -b $branchName
-		git add test_cases/search.json
+		git add test_cases/feedback_pass.json test_cases/feedback_fail.json
 		git commit -q -m "Feedback app test-cases for $date."
 		git push -q --set-upstream origin $branchName
 
