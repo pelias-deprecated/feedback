@@ -1,0 +1,20 @@
+machine:
+  ruby:
+    version: 2.1.2
+database:
+  override:
+    - echo "we need no database" 
+test:
+  override:
+    - echo "we need no tests"
+
+deployment:
+  #staging:
+  #  branch: master
+  #  commands:
+  #    - ./deploy/env.rb staging
+  production:
+    # branch: production # maybe later on
+    branch: master
+    commands:
+      - ./deploy/env.rb production
