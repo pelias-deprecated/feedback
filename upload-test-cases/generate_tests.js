@@ -9,17 +9,27 @@ var mongo = require( 'mongodb' );
 var monk = require( 'monk' );
 var db = monk( 'localhost:27017/pelias' );
 
+/**
+ * Move all documents in the `pelias` collection to a "backup" `pelias-backup`
+ * collection and wipe `pelias`. Call `cb` when finished.
+ */
 function backupCollection( cb ){
-  db.get( 'pelias' ).find({}, function (err, docs){
+  var peliasCollection = db.get( 'pelias' );
+  peliasCollection.find({}, function (err, docs){
     db.get( 'peliasBackup' ).insert( docs, function (){
       peliasCollection.remove( {}, function (){
-        db.close();
         cb();
       });
     });
   });
 }
 
+/**
+ * Given `oldTests`, which should be the `tests` array property of an
+ * acceptance-tests suite, and `newDocs`, which is an array of documents
+ * extracted from Mongo, create new test-cases from the `newDocs` records and
+ * inject them into `oldTests`.
+ */
 function addTests( oldTests, newDocs ){
   var existingInputs = oldTests.map( function ( test ){
     return test.in.input;
@@ -67,12 +77,23 @@ function addTests( oldTests, newDocs ){
   });
 }
 
+/**
+ * Create test-cases for all documents in `newDocs` and inject them into the
+ * test-suite file at `path`.
+ */
 function updateTestFile( path, newDocs ){
   var existingTests = JSON.parse( fs.readFileSync( path ) );
   addTests( existingTests.tests, newDocs );
   fs.writeFileSync( path, JSON.stringify( existingTests, undefined, 2 ) );
 }
 
+/**
+ * Assuming that the `pelias/acceptance-tests` repo is cloned to an
+ * `acceptance-tests` directory sitting inside this directory, extract the
+ * records stored by the feedback app from MongoDB, create passing/failing test
+ * cases for them, and inject them into the `feedback_pass.json` and
+ * `feedback_fail.json` files in `./acceptance-tests/test_cases/`.
+ */
 function updateTestFiles(){
   db.get( 'pelias' ).find( {}, function ( err, docs ){
     if( err ){
@@ -94,7 +115,9 @@ function updateTestFiles(){
     var testDir = './acceptance-tests/test_cases/';
     updateTestFile( testDir + 'feedback_pass.json', passingDocs );
     updateTestFile( testDir + 'feedback_fail.json', failingDocs );
-    db.close();
+    backupCollection( function (  ){
+      db.close();
+    });
   });
 }
 
