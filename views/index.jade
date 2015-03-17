@@ -13,7 +13,7 @@ block content
             a(data-ng-click="selectResult(result)")
               i(title="{{result.type}}", data-toggle="tooltip", class="glyphicon glyphicon-{{result.icon}}")
               span(data-ng-bind-html="result.htmltext")
-            a(data-ng-click="showMap(result)")
+            a(data-ng-click="showMap($event, result)")
               i.glyphicon.glyphicon-map-marker.hidden-xs(title='click to see map')
 
         button(class='headroom btn btn-default btn-block {{button.class}}', ng-click='giveFeedback(button.class, attempt)')= "{{button.text}}"

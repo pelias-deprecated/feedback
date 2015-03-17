@@ -4,7 +4,7 @@ app.run(function($rootScope) {});
 
 app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   
-  var default_zoom = 3;
+  var default_zoom = 2;
 
   $scope.map = L.map('map', {
       zoom: default_zoom,
@@ -15,10 +15,10 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   L.tileLayer('//{s}.tiles.mapbox.com/v3/randyme.i0568680/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 18,
-      minZoom: 3,
+      minZoom: 2,
       noWrap: true
   }).addTo($scope.map);
-  $scope.map_class = 'hidden';
+  $scope.map_class = 'initial_state';
 
   $scope.search = '';
   $scope.searchresults = [];
@@ -145,7 +145,11 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.keyPressed = function(ev) {
     if (ev.which == 13) {
       $scope.fullTextSearch();
-    } 
+    } else {
+      // set default map
+      remove_markers();
+      $scope.map.setView(L.latLng(0,0), default_zoom);
+    }
   }
 
   $scope.onFocus = function(ev) {
@@ -187,17 +191,37 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     marker.openPopup();
   };
 
-  $scope.showMap = function(result) {
+  $scope.getZoom = function(layer) {
+    // layer can be geoname,osmnode,osmway,admin0,admin1,admin2,
+    // neighborhood,osmaddress,openaddresses,admin,address,poi
+
+    var isAdmin = layer.indexOf('admin') !== -1 || layer.indexOf('neighborhood') !== -1;
+    var isPoint = layer.indexOf('address') !== -1 || layer.indexOf('osm') !== -1;
+    var zoom = default_zoom;
+
+    if (isAdmin) {
+      zoom = 5;
+    } else if (isPoint) {
+      zoom = 14;
+    } else {
+      zoom = 10;
+    }
+
+    return zoom;
+  };
+
+  $scope.showMap = function($event, result) {
     $scope.map_class = '';
     remove_markers();
-
+    $('.glyphicon-map-marker').removeClass('selected');
+    $($event.currentTarget).find('i').addClass('selected');
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
-      $scope.map.setView(geo, default_zoom);
+      $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
       add_marker(geo, result.properties);
     } else {
       var geo = [result.lat,result.lon];
-      $scope.map.setView(geo, default_zoom);
+      $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
       add_marker(geo, result.display_name);
     }
   };
@@ -269,7 +293,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
         }
         $scope.log={};
         $scope.attempt =0;
-        $scope.map_class='hidden';
+        $scope.map_class='initial_state';
       }
     }
   }
