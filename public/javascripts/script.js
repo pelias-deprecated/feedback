@@ -191,17 +191,36 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     marker.openPopup();
   };
 
+  $scope.getZoom = function(layer) {
+    // layer can be geoname,osmnode,osmway,admin0,admin1,admin2,
+    // neighborhood,osmaddress,openaddresses,admin,address,poi
+    
+    var isAdmin = layer.indexOf('admin') !== -1 || layer.indexOf('neighborhood') !== -1;
+    var isPoint = layer.indexOf('address') !== -1 || layer.indexOf('osm') !== -1;
+    var zoom = default_zoom;
+
+    if (isAdmin) {
+      zoom = 5;
+    } else if (isPoint) {
+      zoom = 14;
+    } else {
+      zoom = 10;
+    }
+
+    return zoom;
+  };
+
   $scope.showMap = function(result) {
     $scope.map_class = '';
     remove_markers();
 
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
-      $scope.map.panTo(geo);
+      $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
       add_marker(geo, result.properties);
     } else {
       var geo = [result.lat,result.lon];
-      $scope.map.panTo(geo);
+      $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
       add_marker(geo, result.display_name);
     }
   };
