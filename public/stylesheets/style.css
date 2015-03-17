@@ -99,7 +99,7 @@ i.glyphicon {
 ul.results li a:hover i.glyphicon-unchecked {
   color:#4cae4c;
 }
-ul.results li a:hover i.glyphicon-map-marker {
+ul.results li a:hover i.glyphicon-map-marker, i.glyphicon-map-marker.selected {
   color:#277eeb;
 }
 i.glyphicon.glyphicon-check {

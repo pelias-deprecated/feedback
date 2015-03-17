@@ -194,7 +194,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.getZoom = function(layer) {
     // layer can be geoname,osmnode,osmway,admin0,admin1,admin2,
     // neighborhood,osmaddress,openaddresses,admin,address,poi
-    
+
     var isAdmin = layer.indexOf('admin') !== -1 || layer.indexOf('neighborhood') !== -1;
     var isPoint = layer.indexOf('address') !== -1 || layer.indexOf('osm') !== -1;
     var zoom = default_zoom;
@@ -210,10 +210,11 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     return zoom;
   };
 
-  $scope.showMap = function(result) {
+  $scope.showMap = function($event, result) {
     $scope.map_class = '';
     remove_markers();
-
+    $('.glyphicon-map-marker').removeClass('selected');
+    $($event.currentTarget).find('i').addClass('selected');
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
       $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
