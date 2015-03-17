@@ -145,7 +145,11 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   $scope.keyPressed = function(ev) {
     if (ev.which == 13) {
       $scope.fullTextSearch();
-    } 
+    } else {
+      // set default map
+      remove_markers();
+      $scope.map.setView(L.latLng(0,0), default_zoom);
+    }
   }
 
   $scope.onFocus = function(ev) {
@@ -193,11 +197,11 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
 
     if (result.geometry) {
       var geo = [result.geometry.coordinates[1],result.geometry.coordinates[0]];
-      $scope.map.setView(geo, default_zoom);
+      $scope.map.panTo(geo);
       add_marker(geo, result.properties);
     } else {
       var geo = [result.lat,result.lon];
-      $scope.map.setView(geo, default_zoom);
+      $scope.map.panTo(geo);
       add_marker(geo, result.display_name);
     }
   };
