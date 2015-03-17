@@ -4,7 +4,7 @@ app.run(function($rootScope) {});
 
 app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   
-  var default_zoom = 3;
+  var default_zoom = 2;
 
   $scope.map = L.map('map', {
       zoom: default_zoom,
@@ -15,7 +15,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
   L.tileLayer('//{s}.tiles.mapbox.com/v3/randyme.i0568680/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 18,
-      minZoom: 3,
+      minZoom: 2,
       noWrap: true
   }).addTo($scope.map);
   $scope.map_class = 'initial_state';
