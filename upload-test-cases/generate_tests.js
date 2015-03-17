@@ -5,6 +5,7 @@
  */
 
 var fs = require( 'fs' );
+var path = require( 'path' );
 var mongo = require( 'mongodb' );
 var monk = require( 'monk' );
 var db = monk( 'localhost:27017/pelias' );
@@ -92,9 +93,10 @@ function updateTestFile( path, newDocs ){
  * `acceptance-tests` directory sitting inside this directory, extract the
  * records stored by the feedback app from MongoDB, create passing/failing test
  * cases for them, and inject them into the `feedback_pass.json` and
- * `feedback_fail.json` files in `./acceptance-tests/test_cases/`.
+ * `feedback_fail.json` files in the `test_cases/` dir in the `testDir`
+ * directory.
  */
-function updateTestFiles(){
+function updateTestFiles( testDir ){
   db.get( 'pelias' ).find( {}, function ( err, docs ){
     if( err ){
       console.error( err );
@@ -112,13 +114,19 @@ function updateTestFiles(){
       ( ( doc.foundInPelias ) ? passingDocs : failingDocs ).push( doc )
     });
 
-    var testDir = './acceptance-tests/test_cases/';
-    updateTestFile( testDir + 'feedback_pass.json', passingDocs );
-    updateTestFile( testDir + 'feedback_fail.json', failingDocs );
+    updateTestFile( path.join( testDir, 'test_cases/feedback_pass.json' ), passingDocs );
+    updateTestFile( path.join( testDir, 'test_cases/feedback_fail.json' ), failingDocs );
     backupCollection( function (  ){
       db.close();
     });
   });
 }
 
-updateTestFiles();
+if( process.argv.length !== 3 ){
+  console.error( 'Incorrect number of arguments. Usage: node generate_tests.js ' +
+    '/path/to/acceptance-tests-repo');
+  process.exit( 1 );
+}
+else {
+  updateTestFiles( process.argv[ 2 ] );
+}
