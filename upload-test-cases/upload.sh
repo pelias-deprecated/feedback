@@ -17,7 +17,7 @@ else
   fi
 
 	git clone -q git@github.com:pelias/acceptance-tests $repo_dest
-	node generate_tests.js $repo_dest/test_cases/search.json
+	node generate_tests.js
 	if [ $? -eq 0 ]; then
 		cd $repo_dest
 
