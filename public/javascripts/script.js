@@ -18,7 +18,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       minZoom: 3,
       noWrap: true
   }).addTo($scope.map);
-  $scope.map_class = 'hidden';
+  $scope.map_class = 'initial_state';
 
   $scope.search = '';
   $scope.searchresults = [];
@@ -269,7 +269,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
         }
         $scope.log={};
         $scope.attempt =0;
-        $scope.map_class='hidden';
+        $scope.map_class='initial_state';
       }
     }
   }
