@@ -51,19 +51,15 @@ function addTests( testsJson, cb ){
         }
       };
 
-      var expectedOutput = null;
       if( doc.foundInPelias ){
         testCase.status = 'pass';
-        var testCaseProps = doc.selected[ 0 ].properties;
-        delete testCaseProps.id;
-        expectedOutput = testCaseProps;
         testCase.expected.properties = doc.selected.map( function ( selectedItem ){
           delete selectedItem.properties.id;
           return selectedItem.properties;
         });
       }
       else if( 'selected' in doc && doc.selected.length > 0 ){
-        expectedOutput = doc.selected[ 0 ].display_name;
+        testCase.expected.properties = doc.selected[ 0 ].display_name;
       }
 
       if( doc.foundInPelias ){
