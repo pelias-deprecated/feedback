@@ -9,15 +9,72 @@ var mongo = require( 'mongodb' );
 var monk = require( 'monk' );
 var db = monk( 'localhost:27017/pelias' );
 
-/**
- * Extract tests-cases from Mongo, conform them to the
- * `pelias/acceptance-tests` format, inject them into the `testsJson` object,
- * and pass it to `cb()`.
- */
-function addTests( testsJson, cb ){
-  var peliasCollection = db.get( 'pelias' );
+function backupCollection( cb ){
+  db.get( 'pelias' ).find({}, function (err, docs){
+    db.get( 'peliasBackup' ).insert( docs, function (){
+      peliasCollection.remove( {}, function (){
+        db.close();
+        cb();
+      });
+    });
+  });
+}
 
-  peliasCollection.find({}, function (err, docs){
+function addTests( oldTests, newDocs ){
+  var existingInputs = oldTests.map( function ( test ){
+    return test.in.input;
+  });
+
+  var timestamp = new Date().getTime().toString() + ':';
+  var testCaseId = 0;
+  newDocs.forEach( function ( doc ){
+    if( existingInputs.indexOf( doc.query ) !== -1 ){
+      return;
+    }
+    existingInputs.push( doc.query );
+    var testCase = {
+      id: timestamp + testCaseId++,
+      user: 'feedback-app',
+      in: {
+        input: doc.query
+      },
+      expected: {
+        properties: null
+      }
+    };
+
+    if( doc.foundInPelias ){
+      testCase.status = 'pass';
+      testCase.expected.properties = doc.selected.map( function ( selectedItem ){
+        delete selectedItem.properties.id;
+        return selectedItem.properties;
+      });
+    }
+    else if( 'selected' in doc && doc.selected.length > 0 ){
+      testCase.expected.properties = doc.selected[ 0 ].display_name;
+    }
+
+    if( doc.foundInPelias ){
+      for( var ind = doc.results.length - 1; ind >= 0; ind-- ){
+        if( doc.results[ ind ].icon === 'check' ){
+          testCase.expected.priorityThresh = ind + 1;
+          break;
+        }
+      }
+    }
+
+    oldTests.push(testCase);
+  });
+}
+
+function updateTestFile( path, newDocs ){
+  var existingTests = JSON.parse( fs.readFileSync( path ) );
+  addTests( existingTests.tests, newDocs );
+  fs.writeFileSync( path, JSON.stringify( existingTests, undefined, 2 ) );
+}
+
+function updateTestFiles(){
+  db.get( 'pelias' ).find( {}, function ( err, docs ){
     if( err ){
       console.error( err );
       process.exit( 1 );
@@ -28,79 +85,17 @@ function addTests( testsJson, cb ){
       process.exit( 2 );
     }
 
-    var existingInputs = testsJson.tests.map( function ( test ){
-      return test.in.input;
-    });
-
-    var timestamp = new Date().getTime().toString() + ':';
-    var testCaseId = 0;
+    var passingDocs = [];
+    var failingDocs = [];
     docs.forEach( function ( doc ){
-      if( existingInputs.indexOf( doc.query ) !== -1 ){
-        return;
-      }
-      existingInputs.push( doc.query );
-
-      var testCase = {
-        id: timestamp + testCaseId++,
-        user: 'feedback-app',
-        in: {
-          input: doc.query
-        },
-        expected: {
-          properties: null
-        }
-      };
-
-      if( doc.foundInPelias ){
-        testCase.status = 'pass';
-        testCase.expected.properties = doc.selected.map( function ( selectedItem ){
-          delete selectedItem.properties.id;
-          return selectedItem.properties;
-        });
-      }
-      else if( 'selected' in doc && doc.selected.length > 0 ){
-        testCase.expected.properties = doc.selected[ 0 ].display_name;
-      }
-
-      if( doc.foundInPelias ){
-        for( var ind = doc.results.length - 1; ind >= 0; ind-- ){
-          if( doc.results[ ind ].icon === 'check' ){
-            testCase.expected.priorityThresh = ind + 1;
-            break;
-          }
-        }
-      }
-
-      testsJson.tests.push(testCase);
+      ( ( doc.foundInPelias ) ? passingDocs : failingDocs ).push( doc )
     });
 
-    db.get( 'peliasBackup' ).insert( docs, function (){
-      peliasCollection.remove( {}, function (){
-        db.close();
-        cb( testsJson );
-      });
-    });
+    var testDir = './acceptance-tests/test_cases/';
+    updateTestFile( testDir + 'feedback_pass.json', passingDocs );
+    updateTestFile( testDir + 'feedback_fail.json', failingDocs );
+    db.close();
   });
 }
 
-/**
- * Modify the JSON tests file specified by `testFilePath`, adding test cases to
- * its `tests` property.
- */
-function updateTestFile( testFilePath ){
-  var testsJson = JSON.parse(fs.readFileSync( testFilePath ));
-  addTests( testsJson, function writeNewFile( newTestJson ){
-    fs.writeFile( testFilePath, JSON.stringify( newTestJson, undefined, 2 ) );
-  });
-}
-
-if( process.argv.length !== 3 ){
-  console.error(
-    'Incorrect number of arguments. Usage:\n\n' +
-    '\tnode generate_tests.js PATH/TO/acceptance-tests/test_cases/search.json'
-  );
-  process.exit( 1 );
-}
-else {
-  updateTestFile( process.argv[ 2 ] );
-}
+updateTestFiles();
