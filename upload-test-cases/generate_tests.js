@@ -6,7 +6,7 @@
 
 var fs = require( 'fs' );
 var path = require( 'path' );
-var mongo = require( 'mongodb' );
+// var mongo = require( 'mongodb' );
 var monk = require( 'monk' );
 var db = monk( 'localhost:27017/pelias' );
 
@@ -111,7 +111,7 @@ function updateTestFiles( testDir ){
     var passingDocs = [];
     var failingDocs = [];
     docs.forEach( function ( doc ){
-      ( ( doc.foundInPelias ) ? passingDocs : failingDocs ).push( doc )
+      ( ( doc.foundInPelias ) ? passingDocs : failingDocs ).push( doc );
     });
 
     updateTestFile( path.join( testDir, 'test_cases/feedback_pass.json' ), passingDocs );
