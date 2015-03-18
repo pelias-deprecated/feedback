@@ -221,7 +221,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
       add_marker(geo, result.properties);
     } else {
       var geo = [result.lat,result.lon];
-      $scope.map.setView(geo, $scope.getZoom(result.properties.layer));
+      $scope.map.setView(geo, 10);
       add_marker(geo, result.display_name);
     }
   };
