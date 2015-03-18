@@ -195,7 +195,7 @@ app.controller('SearchController', function($scope, $rootScope, $sce, $http) {
     // layer can be geoname,osmnode,osmway,admin0,admin1,admin2,
     // neighborhood,osmaddress,openaddresses,admin,address,poi
 
-    var isAdmin = layer.indexOf('admin') !== -1 || layer.indexOf('neighborhood') !== -1;
+    var isAdmin = layer.indexOf('admin') !== -1;
     var isPoint = layer.indexOf('address') !== -1 || layer.indexOf('osm') !== -1;
     var zoom = default_zoom;
 
