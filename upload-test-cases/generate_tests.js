@@ -1,5 +1,5 @@
 /**
- * Given a path to a `pelias/acceptance-tests` tests JSON file, add the tests
+ * Given a path to a `pelias/fuzzy-tests` tests JSON file, add the tests
  * in the local Mongo server's Pelias collection (as stored by the feedback
  * app) to it.
  */
@@ -27,7 +27,7 @@ function backupCollection( cb ){
 
 /**
  * Given `oldTests`, which should be the `tests` array property of an
- * acceptance-tests suite, and `newDocs`, which is an array of documents
+ * fuzzy-tests suite, and `newDocs`, which is an array of documents
  * extracted from Mongo, create new test-cases from the `newDocs` records and
  * inject them into `oldTests`.
  */
@@ -89,8 +89,8 @@ function updateTestFile( path, newDocs ){
 }
 
 /**
- * Assuming that the `pelias/acceptance-tests` repo is cloned to an
- * `acceptance-tests` directory sitting inside this directory, extract the
+ * Assuming that the `pelias/fuzzy-tests` repo is cloned to an
+ * `fuzzy-tests` directory sitting inside this directory, extract the
  * records stored by the feedback app from MongoDB, create passing/failing test
  * cases for them, and inject them into the `feedback_pass.json` and
  * `feedback_fail.json` files in the `test_cases/` dir in the `testDir`
@@ -124,7 +124,7 @@ function updateTestFiles( testDir ){
 
 if( process.argv.length !== 3 ){
   console.error( 'Incorrect number of arguments. Usage: node generate_tests.js ' +
-    '/path/to/acceptance-tests-repo');
+    '/path/to/fuzzy-tests-repo');
   process.exit( 1 );
 }
 else {
