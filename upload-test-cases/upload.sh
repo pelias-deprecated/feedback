@@ -22,7 +22,7 @@ else
 		cd $repo_dest
 
 		# Checkout a branch, push the new test-cases.
-		date="$(date +%Y-%M-%d-%H-%M-%S)"
+		date="$(date +%Y-%m-%d-%H-%M-%S)"
 		branchName="feedback_$date"
 		git checkout -q -b $branchName
 		git add test_cases/feedback_pass.json test_cases/feedback_fail.json
